@@ -1,0 +1,210 @@
+# 閾値定義ファイル
+#
+# 目的:
+#   ダッシュボードで使う閾値を一元管理。
+#   ハードコード禁止、すべての画面はこのYAMLを起動時に読み込む。
+#
+# ヒアリング後の更新:
+#   各項目の hearing_status を "未" → "実施中" → "確定" に更新する。
+#   value を実値に書き換えれば、ダッシュ再起動だけで反映される。
+#
+# 値の意味:
+#   value:           実際に使う閾値
+#   unit:            単位（pct = パーセント, jpy = 円, days = 日数, count = 件数）
+#   direction:       lower_is_bad（小さいと悪い）/ higher_is_bad / out_of_range
+#   rationale:       仮置きの根拠
+#   hearing_status:  未 / 実施中 / 確定
+#
+# ============================================================
+
+version: "0.1-poc"
+last_updated: "2026-05-27"
+
+# ============================================================
+# A. 基本量
+# ============================================================
+plan_achievement:
+  anken_registration:
+    warning_pct:
+      value: 80
+      unit: pct
+      direction: lower_is_bad
+      rationale: "計画比80%下回りで下位四分位"
+      hearing_status: 未
+    critical_pct:
+      value: 60
+      unit: pct
+      direction: lower_is_bad
+      rationale: "要対応水準"
+      hearing_status: 未
+  contract_count:
+    warning_pct:
+      value: 85
+      unit: pct
+      direction: lower_is_bad
+      rationale: "契約は遅行指標、案件登録より厳しめ"
+      hearing_status: 未
+  gross_profit:
+    warning_pct:
+      value: 90
+      unit: pct
+      direction: lower_is_bad
+      rationale: "粗利は最終KPI、最も厳しい閾値"
+      hearing_status: 未
+
+# ============================================================
+# B. 指示書記載の5指標
+# ============================================================
+gross_profit_per_person:
+  warning_q1:
+    value: 1500000   # 円/月。17期実績の第1四分位を想定
+    unit: jpy
+    direction: lower_is_bad
+    rationale: "17期実績の第1四分位。デモデータ生成後に再計算予定"
+    hearing_status: 未
+  employee_coefficient:
+    sales_fulltime: 1.0
+    sales_dispatch: 0.7
+    sales_crew:     0.5
+    office_fulltime: 0.0   # ★要ヒアリング: 0.5や1.0に変わる可能性あり
+    rationale_office: "事務正社員を営業人員に含めるかは要確認"
+    hearing_status: 未
+
+santame_ratio:
+  normal_range:
+    lower_pct:
+      value: 10
+      unit: pct
+      rationale: "17期実績の中央値-1σ想定"
+      hearing_status: 未
+    upper_pct:
+      value: 35
+      unit: pct
+      rationale: "17期実績の中央値+1σ想定"
+      hearing_status: 未
+  direction: out_of_range
+
+inventory_turnover_days:
+  warning:
+    value: 120
+    unit: days
+    direction: higher_is_bad
+    rationale: "対数正規分布（平均60日）の第3四分位前後"
+    hearing_status: 未
+  critical:
+    value: 180
+    unit: days
+    direction: higher_is_bad
+    rationale: "要対応水準"
+    hearing_status: 未
+
+cash_invested_margin:
+  warning_q1:
+    value: 8         # %
+    unit: pct
+    direction: lower_is_bad
+    rationale: "17期実績の第1四分位想定。デモデータ生成後に再計算"
+    hearing_status: 未
+
+closing_rate:
+  warning_q1:
+    value: 35        # %
+    unit: pct
+    direction: lower_is_bad
+    rationale: "17期実績の第1四分位想定。デモデータ生成後に再計算"
+    hearing_status: 未
+
+# ============================================================
+# C. 情報源効率
+# ============================================================
+info_source_efficiency:
+  closing_rate_vs_avg_pct:
+    value: 50
+    unit: pct
+    direction: lower_is_bad
+    rationale: "自支店平均の50%未満は要見直し"
+    hearing_status: 未
+  dependency_max_pct:
+    value: 60
+    unit: pct
+    direction: higher_is_bad
+    rationale: "単一情報源依存が60%超で偏りリスク"
+    hearing_status: 未
+  margin_per_anken_vs_avg_pct:
+    value: 50
+    unit: pct
+    direction: lower_is_bad
+    rationale: "他情報源平均の50%以下は低効率"
+    hearing_status: 未
+
+# ============================================================
+# D. 出口構成
+# ============================================================
+exit_composition:
+  legal_individual_deviation_pct:
+    value: 15
+    unit: pct
+    direction: out_of_range
+    rationale: "17期実績から±15%の乖離で警告"
+    hearing_status: 未
+  current_resale_deviation_pct:
+    value: 15
+    unit: pct
+    direction: out_of_range
+    rationale: "17期実績から±15%の乖離で警告"
+    hearing_status: 未
+
+# ============================================================
+# E. 成長
+# ============================================================
+growth:
+  yoy_warning_pct:
+    value: 0
+    unit: pct
+    direction: lower_is_bad
+    rationale: "前年割れは即警告"
+    hearing_status: 未
+  yoy_critical_pct:
+    value: -10
+    unit: pct
+    direction: lower_is_bad
+    rationale: "前年比-10%未満は要対応"
+    hearing_status: 未
+  cohort_bottom_quartile_pct:
+    value: 25
+    unit: pct
+    direction: lower_is_bad
+    rationale: "同期内下位25%は育成見直し対象"
+    hearing_status: 未
+  branch_maturity_month12_min_gp:
+    value: 10000000  # 円。開設12か月で月次粗利1000万未満なら立ち上がり遅れ
+    unit: jpy
+    direction: lower_is_bad
+    rationale: "出店計画との突合用、仮置き"
+    hearing_status: 未
+
+# ============================================================
+# F. 健康度
+# ============================================================
+health:
+  long_inventory_days:
+    value: 120
+    unit: days
+    direction: higher_is_bad
+    rationale: "B-3 inventory_turnover_days.warning と整合"
+    hearing_status: 未
+  watch_member_count_warning:
+    value: 3
+    unit: count
+    direction: higher_is_bad
+    rationale: "チーム全体の健康度指標、3名以上で警告"
+    hearing_status: 未
+
+# ============================================================
+# 表示設定
+# ============================================================
+display:
+  show_median_with_average: true   # 平均値の横に中央値を併記
+  default_period: "current_month"  # current_month / current_quarter / current_fiscal
+  default_comparison: "yoy"        # yoy / branch_benchmark / cohort
+  next_action_show_on_breach: true # 閾値超過時にNext Action欄を自動表示
