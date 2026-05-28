@@ -1,9 +1,10 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/**/*.py": {
-      "runtime": "@vercel/python"
+      "maxDuration": 300
     }
   },
   "routes": [
