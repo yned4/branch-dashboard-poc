@@ -2,7 +2,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import meta, health, members, info_source, exit_analysis, contracts, growth, export, chat
+from backend.routers import (
+    meta,
+    health,
+    members,
+    info_source,
+    exit_analysis,
+    contracts,
+    growth,
+    export,
+    chat,
+)
 
 app = FastAPI(
     title="不動産買取再販ダッシュボード API",

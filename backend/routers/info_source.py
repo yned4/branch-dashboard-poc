@@ -2,8 +2,8 @@
 import pandas as pd
 from fastapi import APIRouter, Query
 from typing import List, Optional
-from services.data import load_data
-from services.thresholds import load as load_thresholds, make_alert
+from backend.services.data import load_data
+from backend.services.thresholds import load as load_thresholds, make_alert
 
 router = APIRouter()
 

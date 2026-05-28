@@ -1,8 +1,8 @@
 """GET /api/health — ヘルスチェック（画面1）"""
 import pandas as pd
 from fastapi import APIRouter, Query
-from services.data import load_data, yoy_ym, headcount_coefficient
-from services.thresholds import load as load_thresholds, check_breach, make_alert
+from backend.services.data import load_data, yoy_ym, headcount_coefficient
+from backend.services.thresholds import load as load_thresholds, check_breach, make_alert
 
 router = APIRouter()
 

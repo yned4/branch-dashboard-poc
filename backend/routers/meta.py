@@ -1,6 +1,6 @@
 """GET /api/meta — マスターデータ一覧"""
 from fastapi import APIRouter
-from services.data import load_data
+from backend.services.data import load_data
 
 router = APIRouter()
 

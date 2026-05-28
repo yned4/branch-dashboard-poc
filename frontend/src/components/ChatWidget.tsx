@@ -119,7 +119,6 @@ export function ChatWidget({ branchId, ym }: Props) {
     const next: Message[] = [...messages, { role: 'user', content: text }]
     setMessages(next)
     setStreaming(true)
-    setMessages(m => [...m, { role: 'assistant', content: '' }])
 
     try {
       const res = await fetch('/api/chat', {
@@ -127,50 +126,13 @@ export function ChatWidget({ branchId, ym }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ branch_id: branchId, ym, messages: next, page }),
       })
-      if (!res.body) throw new Error('no body')
-
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let buf = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        buf += decoder.decode(value, { stream: true })
-        const lines = buf.split('\n')
-        buf = lines.pop() ?? ''
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue
-          const payload = line.slice(6)
-          if (payload === '[DONE]') break
-          try {
-            const obj = JSON.parse(payload)
-            if (obj.text) {
-              setMessages(m => {
-                const copy = [...m]
-                copy[copy.length - 1] = {
-                  role: 'assistant',
-                  content: copy[copy.length - 1].content + obj.text,
-                }
-                return copy
-              })
-            }
-            if (obj.error) {
-              setMessages(m => {
-                const copy = [...m]
-                copy[copy.length - 1] = { role: 'assistant', content: `エラー: ${obj.error}` }
-                return copy
-              })
-            }
-          } catch {}
-        }
-      }
+      const obj = await res.json().catch(() => ({} as any))
+      if (!res.ok) throw new Error(obj?.error || `${res.status} ${res.statusText}`)
+      if (obj?.error) throw new Error(obj.error)
+      const reply = (obj?.text ?? '').toString()
+      setMessages(m => [...m, { role: 'assistant', content: reply || '（応答が空でした）' }])
     } catch (e: any) {
-      setMessages(m => {
-        const copy = [...m]
-        copy[copy.length - 1] = { role: 'assistant', content: `接続エラー: ${e.message}` }
-        return copy
-      })
+      setMessages(m => [...m, { role: 'assistant', content: `接続エラー: ${e.message}` }])
     } finally {
       setStreaming(false)
     }

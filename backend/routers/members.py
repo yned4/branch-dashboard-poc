@@ -1,8 +1,8 @@
 """GET /api/members — メンバートラッカー（画面2）"""
 import pandas as pd
 from fastapi import APIRouter, Query
-from services.data import load_data, yoy_ym
-from services.thresholds import load as load_thresholds, make_alert
+from backend.services.data import load_data, yoy_ym
+from backend.services.thresholds import load as load_thresholds, make_alert
 
 router = APIRouter()
 

@@ -146,7 +146,7 @@ export function DonutChart({ data, colors = COLORS.BLUES_5, height = 260, title 
       <ResponsiveContainer width="100%" height={height}>
         <PieChart>
           <Pie data={data} cx="50%" cy="50%" innerRadius="40%" outerRadius="70%"
-            dataKey="value" nameKey="name" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            dataKey="value" nameKey="name" label={({ name, percent = 0 }) => `${name} ${(percent * 100).toFixed(0)}%`}
             labelLine={false} fontSize={11}>
             {data.map((_, i) => <Cell key={i} fill={colors[i % colors.length]} />)}
           </Pie>

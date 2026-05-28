@@ -1,15 +1,13 @@
 """POST /api/chat — Claude へのストリーミングチャット"""
-import json
 import os
 from typing import List
 
 import anthropic
 from fastapi import APIRouter
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from services.data import load_data
-from services.thresholds import load as load_thresholds
+from backend.services.data import load_data
+from backend.services.thresholds import load as load_thresholds
 
 router = APIRouter()
 _client = None
@@ -104,22 +102,17 @@ async def chat(req: ChatRequest):
     system = _system_prompt(context, req.page)
     messages = [{"role": m.role, "content": m.content} for m in req.messages]
 
-    def generate():
-        try:
-            with _get_client().messages.stream(
-                model="claude-haiku-4-5-20251001",
-                max_tokens=512,
-                system=system,
-                messages=messages,
-            ) as stream:
-                for text in stream.text_stream:
-                    yield f"data: {json.dumps({'text': text}, ensure_ascii=False)}\n\n"
-        except Exception as e:
-            yield f"data: {json.dumps({'error': str(e)}, ensure_ascii=False)}\n\n"
-        yield "data: [DONE]\n\n"
-
-    return StreamingResponse(
-        generate(),
-        media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-    )
+    try:
+        res = _get_client().messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=512,
+            system=system,
+            messages=messages,
+        )
+        text = ""
+        for block in getattr(res, "content", []) or []:
+            if getattr(block, "type", None) == "text":
+                text += getattr(block, "text", "") or ""
+        return {"text": text}
+    except Exception as e:
+        return {"error": str(e)}

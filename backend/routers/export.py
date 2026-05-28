@@ -1,8 +1,8 @@
 """GET /api/export — レビュー会用エクスポートサマリー（画面7）"""
 import pandas as pd
 from fastapi import APIRouter, Query
-from services.data import load_data, yoy_ym, headcount_coefficient
-from services.thresholds import load as load_thresholds
+from backend.services.data import load_data, yoy_ym, headcount_coefficient
+from backend.services.thresholds import load as load_thresholds
 
 router = APIRouter()
 

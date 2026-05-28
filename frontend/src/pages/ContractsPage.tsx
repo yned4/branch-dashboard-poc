@@ -5,7 +5,7 @@ import type { MetaData } from '../types'
 import { AlertBox } from '../components/AlertBox'
 import { SectionHeader } from '../components/SectionHeader'
 import { FilterPanel, SelectField, MultiSelectField } from '../components/FilterPanel'
-import { BarChartV, BarChartH, LineChartC, ScatterChartC, Histogram, COLORS } from '../components/Charts'
+import { BarChartV, LineChartC, ScatterChartC, Histogram, COLORS } from '../components/Charts'
 import { KPICard } from '../components/KPICard'
 
 interface Props { branchId: number; meta: MetaData }
